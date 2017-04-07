@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-using ICSharpCode.SharpZipLib.BZip2;
+//using ICSharpCode.SharpZipLib.BZip2;
+using System.IO.Compression;
 
 namespace BsDiff
 {
@@ -82,7 +83,7 @@ namespace BsDiff
 			int dblen = 0;
 			int eblen = 0;
 
-			using (BZip2OutputStream bz2Stream = new BZip2OutputStream(output) { IsStreamOwner = false })
+			using (System.IO.Compression.GZipStream bz2Stream = new System.IO.Compression.GZipStream(output, CompressionLevel.Optimal, true))
 			{
 				// compute the differences, writing ctrl as we go
 				int scan = 0;
@@ -199,7 +200,7 @@ namespace BsDiff
 			WriteInt64(controlEndPosition - startPosition - c_headerSize, header, 8);
 
 			// write compressed diff data
-			using (BZip2OutputStream bz2Stream = new BZip2OutputStream(output) { IsStreamOwner = false})
+			using (System.IO.Compression.GZipStream bz2Stream = new System.IO.Compression.GZipStream(output,CompressionLevel.Optimal, true))
 			{
 				bz2Stream.Write(db, 0, dblen);
 			}
@@ -209,7 +210,7 @@ namespace BsDiff
 			WriteInt64(diffEndPosition - controlEndPosition, header, 16);
 
 			// write compressed extra data
-			using (BZip2OutputStream bz2Stream = new BZip2OutputStream(output) { IsStreamOwner = false })
+			using (System.IO.Compression.GZipStream bz2Stream = new System.IO.Compression.GZipStream(output, CompressionLevel.Optimal, true))
 			{
 				bz2Stream.Write(eb, 0, eblen);
 			}
@@ -294,9 +295,9 @@ namespace BsDiff
 				compressedExtraStream.Seek(c_headerSize + controlLength + diffLength, SeekOrigin.Current);
 
 				// decompress each part (to read it)
-				using (BZip2InputStream controlStream = new BZip2InputStream(compressedControlStream))
-				using (BZip2InputStream diffStream = new BZip2InputStream(compressedDiffStream))
-				using (BZip2InputStream extraStream = new BZip2InputStream(compressedExtraStream))
+				using (System.IO.Compression.GZipStream controlStream = new System.IO.Compression.GZipStream(compressedControlStream, CompressionMode.Decompress, true))
+				using (System.IO.Compression.GZipStream diffStream = new System.IO.Compression.GZipStream(compressedDiffStream, CompressionMode.Decompress, true))
+				using (System.IO.Compression.GZipStream extraStream = new System.IO.Compression.GZipStream(compressedExtraStream, CompressionMode.Decompress, true))
 				{
 					long[] control = new long[3];
 					byte[] buffer = new byte[8];

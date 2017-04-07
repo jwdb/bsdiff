@@ -11,10 +11,9 @@ namespace BsPatch
 		{
 			// check for correct usage
 			if (args.Length != 3)
-			{
-				Console.Error.WriteLine("bsdiff oldfile newfile patchfile");
-				return;
-			}
+            {
+                args = Console.ReadLine().Split(' ');
+            }
 
 			string oldFile = args[0];
 			string newFile = args[1];

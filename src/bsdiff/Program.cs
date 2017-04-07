@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.IO.Compression;
 
 namespace BsDiff
 {
@@ -13,8 +14,9 @@ namespace BsDiff
 			// check for correct usage
 			if (args.Length != 3)
 			{
-				Console.Error.WriteLine("bsdiff oldfile newfile patchfile");
-				return;
+                Console.Error.WriteLine("bsdiff oldfile newfile patchfile");
+                args = Console.ReadLine().Split(' ');
+				//return;
 			}
 
 			// check for special command-line switch that performs a self-test
@@ -30,9 +32,9 @@ namespace BsDiff
 
 				try
 				{
-					using (FileStream output = new FileStream(patchFile, FileMode.Create))
-						BinaryPatchUtility.Create(File.ReadAllBytes(oldFile), File.ReadAllBytes(newFile), output);
-				}
+                        using (FileStream output = new FileStream(patchFile, FileMode.Create))
+                            BinaryPatchUtility.Create(File.ReadAllBytes(oldFile), File.ReadAllBytes(newFile), output);
+                }
 				catch (FileNotFoundException ex)
 				{
 					Console.Error.WriteLine("Could not open '{0}'.", ex.FileName);
